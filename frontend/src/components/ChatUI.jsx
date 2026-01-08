@@ -1,9 +1,8 @@
 import { useRef, useEffect } from "react";
 
-export default function ChatUI({ messages, input, setInput, sendMessage }) {
+export default function ChatUI({ messages, input, setInput, sendMessage, mode, setMode, isLoading }) {
   const messagesEndRef = useRef(null);
 
-  // Auto-scroll when new message appears
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -11,7 +10,23 @@ export default function ChatUI({ messages, input, setInput, sendMessage }) {
   return (
     <div className="chat-container">
       {/* Header */}
-      <div className="chat-header">🏠 Real Estate Chatbot</div>
+      <div className="chat-header">
+        <span>AI Assistant</span>
+        <div className="mode-toggle">
+          <button
+            className={mode === "rag" ? "active" : ""}
+            onClick={() => setMode("rag")}
+          >
+            Docs
+          </button>
+          <button
+            className={mode === "sql" ? "active" : ""}
+            onClick={() => setMode("sql")}
+          >
+            Database
+          </button>
+        </div>
+      </div>
 
       {/* Messages */}
       <div className="chat-messages">
@@ -20,6 +35,13 @@ export default function ChatUI({ messages, input, setInput, sendMessage }) {
             {msg.text}
           </div>
         ))}
+        {isLoading && (
+          <div className="message bot loading">
+            <span className="dot"></span>
+            <span className="dot"></span>
+            <span className="dot"></span>
+          </div>
+        )}
         <div ref={messagesEndRef} />
       </div>
 
@@ -27,12 +49,15 @@ export default function ChatUI({ messages, input, setInput, sendMessage }) {
       <div className="chat-input">
         <input
           type="text"
-          placeholder="Ask about properties (e.g., 2BHK in Delhi)..."
+          placeholder={mode === "rag" ? "Ask about your documents..." : "Ask about the database..."}
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+          onKeyDown={(e) => e.key === "Enter" && !isLoading && sendMessage()}
+          disabled={isLoading}
         />
-        <button onClick={sendMessage}>Send</button>
+        <button onClick={sendMessage} disabled={isLoading}>
+          {isLoading ? "..." : "Send"}
+        </button>
       </div>
     </div>
   );

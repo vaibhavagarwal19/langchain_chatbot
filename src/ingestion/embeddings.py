@@ -1,4 +1,8 @@
-from langchain_openai import OpenAIEmbeddings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from src.config.settings import settings
 
 def get_embeddings():
-    return OpenAIEmbeddings()
+    return GoogleGenerativeAIEmbeddings(
+        model="models/embedding-001",
+        google_api_key=settings.GOOGLE_API_KEY
+    )

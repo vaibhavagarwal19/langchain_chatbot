@@ -4,18 +4,22 @@ import { sendMessage as apiSendMessage } from "./api";
 
 export default function App() {
   const [messages, setMessages] = useState([
-    { role: "bot", text: "👋 Hi! I’m your Real Estate Assistant. Ask me about properties!" },
+    { role: "bot", text: "Hi! I'm your AI Assistant. Choose a mode and ask me anything!" },
   ]);
   const [input, setInput] = useState("");
+  const [mode, setMode] = useState("rag"); // "rag" or "sql"
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSend = async () => {
-    if (!input.trim()) return;
+    if (!input.trim() || isLoading) return;
 
-    // Add user message
-    setMessages([...messages, { role: "user", text: input }]);
+    const userMessage = input;
+    setInput("");
+    setMessages((prev) => [...prev, { role: "user", text: userMessage }]);
+    setIsLoading(true);
 
     try {
-      const res = await apiSendMessage(input);
+      const res = await apiSendMessage(userMessage, mode);
       setMessages((prev) => [
         ...prev,
         { role: "bot", text: res.answer || "No response" },
@@ -23,12 +27,22 @@ export default function App() {
     } catch (err) {
       setMessages((prev) => [
         ...prev,
-        { role: "bot", text: "❌ Failed to fetch response from server." },
+        { role: "bot", text: "Failed to fetch response. Is the server running?" },
       ]);
+    } finally {
+      setIsLoading(false);
     }
-
-    setInput("");
   };
 
-  return <ChatUI messages={messages} input={input} setInput={setInput} sendMessage={handleSend} />;
+  return (
+    <ChatUI
+      messages={messages}
+      input={input}
+      setInput={setInput}
+      sendMessage={handleSend}
+      mode={mode}
+      setMode={setMode}
+      isLoading={isLoading}
+    />
+  );
 }

@@ -19,7 +19,36 @@
   padding: 12px 16px;
   font-size: 18px;
   font-weight: bold;
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* ===== Mode Toggle ===== */
+.mode-toggle {
+  display: flex;
+  gap: 4px;
+}
+
+.mode-toggle button {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.2s;
+}
+
+.mode-toggle button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.mode-toggle button.active {
+  background: white;
+  color: #4f46e5;
+  font-weight: bold;
 }
 
 /* ===== Messages Area ===== */
@@ -80,6 +109,35 @@
   font-weight: bold;
 }
 
-.chat-input button:hover {
+.chat-input button:hover:not(:disabled) {
   background: #4338ca;
+}
+
+.chat-input button:disabled,
+.chat-input input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== Loading Animation ===== */
+.message.loading {
+  display: flex;
+  gap: 4px;
+  padding: 14px 18px;
+}
+
+.message.loading .dot {
+  width: 8px;
+  height: 8px;
+  background: #666;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.message.loading .dot:nth-child(1) { animation-delay: -0.32s; }
+.message.loading .dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
 }
