@@ -1,22 +1,24 @@
 from fastapi import APIRouter
 from src.api.schemas import QueryRequest, QueryResponse
-from src.agents.sql_agent import build_sql_agent
+from src.chains.qa_chain import build_chatbot
 
 router = APIRouter()
-sql_agent = build_sql_agent()
-chat_history = []   # store history as list of (q, a) tuples
+
+chatbot = build_chatbot()
+chat_history = []   # list of (question, answer)
 
 @router.post("/chat", response_model=QueryResponse)
 async def chat(request: QueryRequest):
     global chat_history
 
-    # Agent answers the query
-    answer = sql_agent.run(request.question)
+    result = chatbot({
+        "question": request.question,
+        "chat_history": chat_history
+    })
 
-    # Save in history
+    answer = result["answer"]
+
+    # update memory
     chat_history.append((request.question, answer))
-
-    # Build a contextual response (optional)
-    context = "\n".join([f"Q: {q}\nA: {a}" for q, a in chat_history])
 
     return QueryResponse(answer=answer)

@@ -4,6 +4,15 @@ from src.vectorstore.chroma_store import get_chroma
 
 def build_chatbot():
     chroma = get_chroma()
-    retriever = chroma.as_retriever()
-    llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
-    return ConversationalRetrievalChain.from_llm(llm, retriever)
+    retriever = chroma.as_retriever(search_kwargs={"k": 3})
+
+    llm = ChatOpenAI(
+        model="gpt-3.5-turbo",
+        temperature=0
+    )
+
+    return ConversationalRetrievalChain.from_llm(
+        llm=llm,
+        retriever=retriever,
+        return_source_documents=False  # set True later if you want citations
+    )
